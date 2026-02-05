@@ -1,6 +1,6 @@
 class Tarea {
     constructor({ id, _id, titulo, descripcion, categoria, estado, creadaPor, asignadoA, fechaCreacion, fechaLimiteISO, fechaLimiteTexto }) {
-        this.id = id || _id || Date.now(); 
+        this.id = _id || id || Date.now(); 
         this.titulo = titulo || "Sin título";
         this.descripcion = descripcion || "Sin descripción detallada";
         this.categoria = categoria || "General";
@@ -97,7 +97,7 @@ class GestorDeTareas {
                     this.inputAsignadoA.appendChild(opt);
                 });
             }
-        } catch (err) { console.error("Error cargando usuarios:", err); }
+        } catch (err) { console.error(err); }
     }
 
     poblarSelectoresFecha() {
@@ -133,7 +133,6 @@ class GestorDeTareas {
         const mesesTexto = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
         const iso = `${this.selAnio.value}-${this.selMes.value}-${this.selDia.value}`;
         const textoLimite = `${this.selDia.value}-${mesesTexto[parseInt(this.selMes.value) - 1]}-${this.selAnio.value}`;
-        
         const d = new Date();
         const fechaCreacionAuto = `${d.getDate().toString().padStart(2, '0')}-${mesesTexto[d.getMonth()]}-${d.getFullYear()}`;
 
@@ -181,7 +180,9 @@ class GestorDeTareas {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
-            if (res.ok) this.cargarTareas();
+            if (res.ok) {
+                this.cargarTareas();
+            }
         } catch (err) { console.error(err); }
     }
 
@@ -275,9 +276,10 @@ class GestorDeTareas {
         `;
 
         li.querySelectorAll('button').forEach(btn => {
-            btn.onclick = e => {
-                const id = e.currentTarget.dataset.id;
-                const action = e.currentTarget.dataset.action;
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                const action = btn.getAttribute('data-action');
                 if (action === 'toggle') this.toggleEstado(id);
                 if (action === 'edit') this.editarTicket(id);
                 if (action === 'delete') this.eliminarTicket(id);
@@ -293,13 +295,21 @@ class GestorDeTareas {
 
         this.tickets.forEach(t => {
             const card = this.crearHTMLTarea(t);
-            
             if (t.creadaPor === this.usuarioActivo) {
                 this.gridCreadas.appendChild(card);
             } 
-            
             if (t.asignadoA === this.usuarioActivo) {
-                this.gridAsignadas.appendChild(card);
+                const cardClon = card.cloneNode(true);
+                cardClon.querySelectorAll('button').forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = btn.getAttribute('data-id');
+                        const action = btn.getAttribute('data-action');
+                        if (action === 'toggle') this.toggleEstado(id);
+                        if (action === 'edit') this.editarTicket(id);
+                        if (action === 'delete') this.eliminarTicket(id);
+                    };
+                });
+                this.gridAsignadas.appendChild(cardClon);
             }
         });
     }
