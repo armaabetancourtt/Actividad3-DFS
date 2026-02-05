@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audi</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="icon" type="image/png" href="../../ACT1/img/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <main class="split-screen">
+        <section class="left-panel">
+            <div id="logo">
+                <img src="../../ACT1/img/logo.webp" alt="Audi Logo">
+            </div>
+
+            <div class="form-container" id="container-login">
+                <h2 class="form-title">Identificación</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" name="username" placeholder="ID de Usuario" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="btn-login" class="btn-audi">
+                        <span>Iniciar Sesión</span>
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                    </button>
+                </form>
+                <div class="toggle-container" style="margin-top: 20px; text-align: center;">
+                    <p style="color: #86868b; font-size: 0.9rem;">¿No tienes cuenta? <a href="#" id="show-register" style="color: #fff; text-decoration: none; font-weight: 700;">Regístrate</a></p>
+                </div>
+            </div>
+
+            <div class="form-container" id="container-register" style="display: none;">
+                <h2 class="form-title">Registro</h2>
+                <form id="register-form">
+                    <div class="input-group">
+                        <label for="reg-username">Nuevo Usuario</label>
+                        <input type="text" id="reg-username" name="reg-username" placeholder="Crea tu ID" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-password">Nueva Contraseña</label>
+                        <input type="password" id="reg-password" name="reg-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="btn-register" class="btn-audi">
+                        <span>Crear Cuenta</span>
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </form>
+                <div class="toggle-container" style="margin-top: 20px; text-align: center;">
+                    <p style="color: #86868b; font-size: 0.9rem;">¿Ya tienes cuenta? <a href="#" id="show-login" style="color: #fff; text-decoration: none; font-weight: 700;">Identifícate</a></p>
+                </div>
+            </div>
+
+            <div class="back-home-container">
+                <a href="../../index.html" class="back-home-link">
+                    <i class="fa-solid fa-chevron-left"></i> Volver al inicio
+                </a>
+            </div>
+
+            <p id="msg" class="msg-box" style="display: none; margin: 20px auto; max-width: 380px;"></p>
+
+            <footer id="footer">
+                <p>© 2026 Audi. Todos los Derechos Reservados.</p>
+            </footer>
+        </section>
+
+        <section class="right-panel">
+            <div class="banner-content">
+                <span class="tag">Acceso</span>
+                <h1>Audi <br><strong>Intelligence</strong></h1>
+                <p>Innovación y precisión en cada tarea técnica.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

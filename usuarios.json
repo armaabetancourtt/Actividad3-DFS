@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1770158696922,
+    "username": "usuario1",
+    "password": "$2b$10$UOoylT9mwJhKjfCxC10mV.eyJYIeHlC5zi.TDly8oXSnUwjlX0xJG"
+  },
+  {
+    "id": 1770159670665,
+    "username": "tecnico1",
+    "password": "$2b$10$19aArw608CaOVhoAYfSO6.PfwLRpwEQsGebuODuxdj9TV/tgqW2qS"
+  },
+  {
+    "id": 1770244128317,
+    "username": "audimty",
+    "password": "$2b$10$Ke5T.j84CK79WJeDX.FNluifo2w0wifpQ10iSAn1HGq0OM9P1TGku"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1770159224051,
+    "titulo": "Frenos A4",
+    "descripcion": "Detalle",
+    "usuarioId": 1770158696922,
+    "completada": false,
+    "categoria": "Ventas",
+    "estado": "En Progreso",
+    "creadaPor": "usuario1",
+    "asignadoA": "tecnico1",
+    "fechaLimiteISO": "2026-01-17",
+    "fechaLimiteTexto": "17-ENE-2026",
+    "fechaCreacion": "04-FEB-2026"
+  },
+  {
+    "id": 1770243555925,
+    "titulo": "Probando",
+    "descripcion": "a",
+    "categoria": "Mantenimiento",
+    "estado": "En Progreso",
+    "creadaPor": "tecnico1",
+    "asignadoA": "audimty",
+    "fechaCreacion": "04-FEB-2026",
+    "fechaLimiteISO": "2026-10-19",
+    "fechaLimiteTexto": "19-OCT-2026",
+    "usuarioId": 1770159670665
+  },
+  {
+    "titulo": "Revisión de Motores Sucursal A4",
+    "descripcion": "Sucursal",
+    "categoria": "Mantenimiento",
+    "estado": "En Progreso",
+    "creadaPor": "audimty",
+    "asignadoA": "Cristian",
+    "fechaCreacion": "04-FEB-2026",
+    "fechaLimiteISO": "2029-01-01",
+    "fechaLimiteTexto": "01-ENE-2029",
+    "id": 1770244182138,
+    "usuarioId": 1770244128317
+  }
+]
