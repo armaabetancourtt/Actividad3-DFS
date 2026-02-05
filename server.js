@@ -121,10 +121,10 @@ app.post('/api/tareas', verificarSesion, validarTarea, async (req, res, next) =>
 
 app.put('/api/tareas/:id', verificarSesion, async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = Number(req.params.id);
         const data = await fs.readFile(DATA_PATH, 'utf-8');
         let tareas = JSON.parse(data || "[]");
-        const idx = tareas.findIndex(t => t.id === id);
+        const idx = tareas.findIndex(t => Number(t.id) === id);
         
         if (idx === -1) return res.status(404).json({ error: "Tarea no encontrada" });
         
@@ -140,15 +140,17 @@ app.put('/api/tareas/:id', verificarSesion, async (req, res, next) => {
 
 app.delete('/api/tareas/:id', verificarSesion, async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = Number(req.params.id);
         const data = await fs.readFile(DATA_PATH, 'utf-8');
         let tareas = JSON.parse(data || "[]");
         
-        const tarea = tareas.find(t => t.id === id);
+        const tarea = tareas.find(t => Number(t.id) === id);
         if (!tarea) return res.status(404).json({ error: "No encontrada" });
-        if (tarea.usuarioId !== req.user.id) return res.status(403).json({ error: "Solo el creador puede eliminar la tarea" });
 
-        const filtradas = tareas.filter(t => t.id !== id);
+        const puedeBorrar = tarea.usuarioId === req.user.id || tarea.asignadoA === req.user.username;
+        if (!puedeBorrar) return res.status(403).json({ error: "No tienes permiso para eliminar esta tarea" });
+
+        const filtradas = tareas.filter(t => Number(t.id) !== id);
         await fs.writeFile(DATA_PATH, JSON.stringify(filtradas, null, 2));
         res.json({ mensaje: "Tarea eliminada" });
     } catch (err) { next(err); }
