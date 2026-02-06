@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('audi_token');
+    if (token) {
+        window.location.href = '../../ACT2/pages/tareas.html';
+        return;
+    }
+
     const containerLogin = document.getElementById('container-login');
     const containerRegister = document.getElementById('container-register');
     const showRegister = document.getElementById('show-register');
