@@ -1,15 +1,15 @@
 class Tarea {
-    constructor({ id, _id, titulo, descripcion, categoria, estado, creadaPor, asignadoA, fechaCreacion, fechaLimiteISO, fechaLimiteTexto }) {
-        this.id = _id || id || Date.now(); 
-        this.titulo = titulo || "Sin título";
-        this.descripcion = descripcion || "Sin descripción detallada";
-        this.categoria = categoria || "General";
-        this.estado = estado || "Sin Iniciar";
-        this.creadaPor = creadaPor || "Usuario Audi";
-        this.asignadoA = asignadoA || "Pendiente de asignar";
-        this.fechaCreacion = fechaCreacion || this.generarFechaActual();
-        this.fechaLimiteISO = fechaLimiteISO || "";
-        this.fechaLimiteTexto = fechaLimiteTexto || "Sin fecha";
+    constructor(data) {
+        this.id = data.id || data._id; 
+        this.titulo = data.titulo || "Sin título";
+        this.descripcion = data.descripcion || "Sin descripción detallada";
+        this.categoria = data.categoria || "General";
+        this.estado = data.estado || "Sin Iniciar";
+        this.creadaPor = data.creadaPor || "Usuario Audi";
+        this.asignadoA = data.asignadoA || "Pendiente de asignar";
+        this.fechaCreacion = data.fechaCreacion || this.generarFechaActual();
+        this.fechaLimiteISO = data.fechaLimiteISO || "";
+        this.fechaLimiteTexto = data.fechaLimiteTexto || "Sin fecha";
     }
 
     generarFechaActual() {
@@ -29,17 +29,14 @@ class GestorDeTareas {
 
         this.gridCreadas = document.getElementById('task-grid-creadas');
         this.gridAsignadas = document.getElementById('task-grid-asignadas');
-        
         this.inputTitulo = document.getElementById('tituloTarea');
         this.inputDescripcion = document.getElementById('descripcionTarea'); 
         this.selectCat = document.getElementById('categoriaTarea');
         this.selectEst = document.getElementById('estadoOperativo');
         this.inputAsignadoA = document.getElementById('asignadoA'); 
-        
         this.selDia = document.getElementById('fecha-dia');
         this.selMes = document.getElementById('fecha-mes');
         this.selAnio = document.getElementById('fecha-anio');
-
         this.editId = document.getElementById('edit-id');
         this.formTitle = document.getElementById('form-title');
         this.btnAgregar = document.getElementById('btn-audi');
@@ -63,7 +60,7 @@ class GestorDeTareas {
                 const base64Url = this.token.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const payload = JSON.parse(window.atob(base64));
-                const nombreToken = payload.nombre || payload.username || payload.email;
+                const nombreToken = payload.usuario || payload.nombre || payload.username;
                 if (nombreToken) {
                     localStorage.setItem('audi_user_name', nombreToken);
                     return nombreToken;
@@ -90,11 +87,13 @@ class GestorDeTareas {
             if (this.inputAsignadoA) {
                 this.inputAsignadoA.innerHTML = '<option value="">Seleccionar Responsable...</option>';
                 usuarios.forEach(user => {
-                    const nombre = user.nombre || user.username;
-                    const opt = document.createElement('option');
-                    opt.value = nombre;
-                    opt.textContent = nombre;
-                    this.inputAsignadoA.appendChild(opt);
+                    const nombre = user.nombre || user.usuario;
+                    if (nombre) {
+                        const opt = document.createElement('option');
+                        opt.value = nombre;
+                        opt.textContent = nombre;
+                        this.inputAsignadoA.appendChild(opt);
+                    }
                 });
             }
         } catch (err) { console.error(err); }
@@ -121,7 +120,10 @@ class GestorDeTareas {
             const res = await fetch(this.API_URL, {
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
-            if (res.status === 401 || res.status === 403) window.location.href = 'index.html';
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '../../index.html';
+                return;
+            }
             const datos = await res.json();
             this.tickets = datos.map(t => new Tarea(t));
             this.render();
@@ -133,9 +135,7 @@ class GestorDeTareas {
         const mesesTexto = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
         const iso = `${this.selAnio.value}-${this.selMes.value}-${this.selDia.value}`;
         const textoLimite = `${this.selDia.value}-${mesesTexto[parseInt(this.selMes.value) - 1]}-${this.selAnio.value}`;
-        const d = new Date();
-        const fechaCreacionAuto = `${d.getDate().toString().padStart(2, '0')}-${mesesTexto[d.getMonth()]}-${d.getFullYear()}`;
-
+        
         const body = {
             titulo: this.inputTitulo.value.trim(),
             descripcion: this.inputDescripcion.value.trim(),
@@ -143,7 +143,6 @@ class GestorDeTareas {
             estado: this.selectEst.value,
             creadaPor: this.usuarioActivo,
             asignadoA: this.inputAsignadoA.value,
-            fechaCreacion: fechaCreacionAuto,
             fechaLimiteISO: iso,
             fechaLimiteTexto: textoLimite
         };
@@ -174,15 +173,13 @@ class GestorDeTareas {
     }
 
     async eliminarTicket(id) {
-        if (!confirm("¿Eliminar este ticket?")) return;
+        if (!confirm("¿Eliminar este ticket permanentemente del sistema?")) return;
         try {
             const res = await fetch(`${this.API_URL}/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
-            if (res.ok) {
-                this.cargarTareas();
-            }
+            if (res.ok) this.cargarTareas();
         } catch (err) { console.error(err); }
     }
 
@@ -191,7 +188,7 @@ class GestorDeTareas {
         if (!ticket) return;
         const nuevoEstado = ticket.estado === "Finalizado" ? "En Progreso" : "Finalizado";
         try {
-            await fetch(`${this.API_URL}/${id}`, {
+            const res = await fetch(`${this.API_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -199,7 +196,7 @@ class GestorDeTareas {
                 },
                 body: JSON.stringify({ estado: nuevoEstado })
             });
-            this.cargarTareas();
+            if (res.ok) this.cargarTareas();
         } catch (err) { console.error(err); }
     }
 
@@ -220,9 +217,9 @@ class GestorDeTareas {
                 this.selDia.value = parts[2];
             }
         }
-        this.formTitle.innerText = "Editando Ticket";
+        this.formTitle.innerText = "Editando Ticket Técnico";
         this.formCard.classList.add('editing');
-        this.btnCancelar.style.display = "block";
+        this.btnCancelar.style.display = "inline-block";
         this.btnAgregar.textContent = "Actualizar en Sistema";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -242,7 +239,11 @@ class GestorDeTareas {
     crearHTMLTarea(t) {
         const li = document.createElement('li');
         li.className = 'task-card';
-        if (t.estado === "Finalizado") li.classList.add('completada');
+        
+        if (t.estado === "Finalizado") {
+            li.classList.add('completada');
+        }
+        
         li.innerHTML = `
             <div class="task-header">
                 <span class="category-label">${t.categoria}</span>
@@ -250,41 +251,37 @@ class GestorDeTareas {
                     <i class="fa-solid fa-circle dot-${t.categoria}"></i> ${t.estado}
                 </span>
             </div>
-            <h3>${t.titulo}</h3>
-            <p class="task-desc">${t.descripcion}</p>
-            <div class="task-info">
-                <p><strong>De:</strong> ${t.creadaPor}</p>
-                <p><strong>Para:</strong> ${t.asignadoA}</p>
-            </div>
-            <div class="task-dates">
-                <span><i class="fa-solid fa-plus"></i> ${t.fechaCreacion}</span>
-                <span><i class="fa-solid fa-hourglass-half"></i> ${t.fechaLimiteTexto}</span>
+            <div class="task-content-wrapper">
+                <h3>${t.titulo}</h3>
+                <p class="task-desc">${t.descripcion}</p>
+                <div class="task-info">
+                    <p><strong>De:</strong> ${t.creadaPor}</p>
+                    <p><strong>Para:</strong> ${t.asignadoA}</p>
+                </div>
+                <div class="task-dates">
+                    <span><i class="fa-solid fa-plus"></i> ${t.fechaCreacion}</span>
+                    <span><i class="fa-solid fa-hourglass-half"></i> ${t.fechaLimiteTexto}</span>
+                </div>
             </div>
             <div class="task-footer">
                 <div class="task-actions">
-                    <button class="btn-sm toggle-btn" data-id="${t.id}" data-action="toggle">
-                        <i class="fa-solid fa-check"></i>
+                    <button class="btn-sm toggle-btn">
+                        <i class="fa-solid ${t.estado === "Finalizado" ? 'fa-rotate-left' : 'fa-check'}"></i>
                     </button>
-                    <button class="btn-sm edit-btn" data-id="${t.id}" data-action="edit">
+                    <button class="btn-sm edit-btn">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button class="btn-sm delete-btn" data-id="${t.id}" data-action="delete">
+                    <button class="btn-sm delete-btn">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             </div>
         `;
 
-        li.querySelectorAll('button').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                const action = btn.getAttribute('data-action');
-                if (action === 'toggle') this.toggleEstado(id);
-                if (action === 'edit') this.editarTicket(id);
-                if (action === 'delete') this.eliminarTicket(id);
-            };
-        });
+        const btns = li.querySelectorAll('button');
+        btns[0].onclick = () => this.toggleEstado(t.id);
+        btns[1].onclick = () => this.editarTicket(t.id);
+        btns[2].onclick = () => this.eliminarTicket(t.id);
 
         return li;
     }
@@ -294,22 +291,12 @@ class GestorDeTareas {
         if (this.gridAsignadas) this.gridAsignadas.innerHTML = '';
 
         this.tickets.forEach(t => {
-            const card = this.crearHTMLTarea(t);
-            if (t.creadaPor === this.usuarioActivo) {
-                this.gridCreadas.appendChild(card);
-            } 
-            if (t.asignadoA === this.usuarioActivo) {
-                const cardClon = card.cloneNode(true);
-                cardClon.querySelectorAll('button').forEach(btn => {
-                    btn.onclick = (e) => {
-                        const id = btn.getAttribute('data-id');
-                        const action = btn.getAttribute('data-action');
-                        if (action === 'toggle') this.toggleEstado(id);
-                        if (action === 'edit') this.editarTicket(id);
-                        if (action === 'delete') this.eliminarTicket(id);
-                    };
-                });
-                this.gridAsignadas.appendChild(cardClon);
+            if (t.creadaPor === this.usuarioActivo && t.asignadoA === this.usuarioActivo) {
+                this.gridAsignadas.appendChild(this.crearHTMLTarea(t));
+            } else if (t.creadaPor === this.usuarioActivo) {
+                this.gridCreadas.appendChild(this.crearHTMLTarea(t));
+            } else if (t.asignadoA === this.usuarioActivo) {
+                this.gridAsignadas.appendChild(this.crearHTMLTarea(t));
             }
         });
     }
