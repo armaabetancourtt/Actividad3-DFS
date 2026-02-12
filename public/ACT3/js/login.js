@@ -1,90 +1,100 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('audi_token');
-    if (token) {
-        window.location.href = '../../ACT2/pages/tareas.html';
-        return;
-    }
+    const contenedorLogin = document.getElementById('container-login');
+    const contenedorRegistro = document.getElementById('container-register');
+    const btnMostrarRegistro = document.getElementById('show-register');
+    const btnMostrarLogin = document.getElementById('show-login');
 
-    const containerLogin = document.getElementById('container-login');
-    const containerRegister = document.getElementById('container-register');
-    const showRegister = document.getElementById('show-register');
-    const showLogin = document.getElementById('show-login');
-    
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const msgBox = document.getElementById('msg');
+    const formularioLogin = document.getElementById('login-form');
+    const formularioRegistro = document.getElementById('register-form');
+    const cajaMensaje = document.getElementById('msg');
 
     const API_URL = '/api';
 
-    const showMessage = (text, isError = true) => {
-        msgBox.textContent = text;
-        msgBox.className = isError ? 'msg-box error' : 'msg-box success';
-        msgBox.style.display = 'block';
+    const mostrarMensaje = (texto, esError = true) => {
+        cajaMensaje.textContent = texto;
+        cajaMensaje.className = esError ? 'msg-box error' : 'msg-box success';
+        cajaMensaje.style.display = 'block';
     };
 
-    showRegister.addEventListener('click', (e) => {
+    btnMostrarRegistro.addEventListener('click', e => {
         e.preventDefault();
-        containerLogin.style.display = 'none';
-        containerRegister.style.display = 'block';
-        msgBox.style.display = 'none';
+        contenedorLogin.style.display = 'none';
+        contenedorRegistro.style.display = 'block';
+        cajaMensaje.style.display = 'none';
     });
 
-    showLogin.addEventListener('click', (e) => {
+    btnMostrarLogin.addEventListener('click', e => {
         e.preventDefault();
-        containerRegister.style.display = 'none';
-        containerLogin.style.display = 'block';
-        msgBox.style.display = 'none';
+        contenedorRegistro.style.display = 'none';
+        contenedorLogin.style.display = 'block';
+        cajaMensaje.style.display = 'none';
     });
 
-    registerForm.addEventListener('submit', async (e) => {
+    formularioRegistro.addEventListener('submit', async e => {
         e.preventDefault();
-        const username = document.getElementById('reg-username').value;
-        const password = document.getElementById('reg-password').value;
+
+        const usuario = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value.trim();
+
+        if (!usuario || !password) {
+            mostrarMensaje('Completa todos los campos');
+            return;
+        }
 
         try {
-            const response = await fetch(`${API_URL}/register`, {
+            const res = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ usuario, password })
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            if (response.ok) {
-                showMessage('Usuario creado con éxito.', false);
-                registerForm.reset();
-                setTimeout(() => showLogin.click(), 2000);
+            if (res.ok) {
+                mostrarMensaje('Usuario creado con éxito', false);
+                formularioRegistro.reset();
+                setTimeout(() => btnMostrarLogin.click(), 1500);
             } else {
-                showMessage(data.error || 'Error en el registro');
+                mostrarMensaje(data.error || 'Error en el registro');
             }
-        } catch (err) {
-            showMessage('Error de conexión con el servidor');
+        } catch {
+            mostrarMensaje('Error de conexión con el servidor');
         }
     });
 
-    loginForm.addEventListener('submit', async (e) => {
+    formularioLogin.addEventListener('submit', async e => {
         e.preventDefault();
-        const username = loginForm.username.value;
-        const password = loginForm.password.value;
+
+        const usuario = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!usuario || !password) {
+            mostrarMensaje('Usuario y contraseña requeridos');
+            return;
+        }
 
         try {
-            const response = await fetch(`${API_URL}/login`, {
+            const res = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ usuario, password })
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            if (response.ok) {
+            if (res.ok) {
                 localStorage.setItem('audi_token', data.token);
-                showMessage('Acceso concedido. Redirigiendo...', false);
-                setTimeout(() => window.location.href = '../../ACT2/pages/tareas.html', 1500);
+                localStorage.setItem('audi_usuario', data.usuario);
+
+                mostrarMensaje('Acceso concedido...', false);
+                setTimeout(() => {
+                    window.location.href = '../../ACT2/pages/tareas.html';
+                }, 1200);
             } else {
-                showMessage(data.error || 'Credenciales incorrectas');
+                mostrarMensaje(data.error || 'Credenciales incorrectas');
             }
-        } catch (err) {
-            showMessage('Error de conexión con el servidor');
+        } catch {
+            mostrarMensaje('Error de conexión con el servidor');
         }
     });
 });
