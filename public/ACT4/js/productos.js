@@ -11,7 +11,7 @@ class Producto {
 
 class GestorInventario {
     constructor() {
-        this.API_URL = 'http://localhost:3000/api/productos';
+        this.API_URL = 'https://actividad4-dfs.onrender.com/api/productos';
         this.token = localStorage.getItem('audi_token');
         this.items = [];
 
@@ -163,5 +163,6 @@ class GestorInventario {
         });
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => new GestorInventario());
