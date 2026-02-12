@@ -1,8 +1,8 @@
-# Actividad 3: Desarrollo Full Stack
+# Actividad 4: Desarrollo Full Stack
 
-# Gestor de Tareas - Express
+# Gestor de Tareas y Productos - Express
 
-Este proyecto es una aplicación backend desarrollada con Node.js y Express que se ejecuta en entorno local (localhost). Permite autenticación de usuarios y gestión de tareas.
+Este proyecto es una aplicación backend desarrollada con Node.js y Express que se ejecuta en entorno local (localhost) y además la nueva añadición el despliegue en la nube de Render. Permite autenticación de usuarios, gestión de tareas y productos.
 
 ---
 
@@ -63,6 +63,14 @@ http://localhost:3000
 Esto cargará la página principal ubicada en la carpeta public.
 
 ---
+
+## Ejecución del proyecto en Cloud
+
+### 1. Abrir el siguiente enlace: ENLACE
+ 
+Espere de 30 a 60 segundos y la página automáticamente se mostrará
+
+---
 ### Credenciales de prueba
 
 Para iniciar sesión desde la página web, utilice las siguientes credenciales:
@@ -72,4 +80,6 @@ Usuario: usuario1
 
 Contraseña: 123
 ```
+
+
 
