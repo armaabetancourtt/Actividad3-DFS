@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 mostrarMensaje('Acceso concedido...', false);
                 setTimeout(() => {
-                    window.location.href = '../../ACT2/pages/tareas.html';
+                    window.location.href = '../../ACT2/pages/dashboard.html';
                 }, 1200);
             } else {
                 mostrarMensaje(data.error || 'Credenciales incorrectas');
@@ -98,3 +98,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
