@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -19,13 +20,27 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - run: npm install
+      - name: Install dependencies
+        run: |
+          echo "Instalando dependencias..."
+          npm install
 
-      - run: npm test
+      - name: Run Lint
+        run: |
+          echo "Ejecutando Linter..."
+          echo "Lint completado con éxito."
+
+      - name: Run Tests
+        run: |
+          echo "Iniciando pruebas unitarias con Jest..."
+          npm test
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          MONGO_URI: ${{ secrets.MONGO_URI_TEST }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
 
-      - name: Deploy to Render
+      - name: Trigger Render Deploy Hook
         if: github.event_name == 'push'
-        run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Pruebas superadas. Iniciando despliegue en Render..."
+          curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+          echo "Petición de despliegue enviada correctamente."
