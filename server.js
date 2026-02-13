@@ -174,7 +174,6 @@ app.post('/api/logout', verificarSesion, async (req, res, next) => {
 app.get('/api/usuarios', verificarSesion, async (req, res, next) => {
     try {
         const usuarios = await Usuario.find({}, { usuario: 1, _id: 1 }).sort({ usuario: 1 });
-        
         const dataCompleta = await Promise.all(usuarios.map(async (u) => {
             const logs = await Log.find({ usuarioId: u._id }).sort({ inicioSesion: -1 });
             return {
@@ -187,7 +186,6 @@ app.get('/api/usuarios', verificarSesion, async (req, res, next) => {
                 }))
             };
         }));
-        
         res.json(dataCompleta);
     } catch (err) {
         next(err);
@@ -312,6 +310,10 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor Audi activo en http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Servidor Audi activo en http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
