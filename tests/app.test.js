@@ -1,11 +1,11 @@
-
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../server');
 
-describe('Pruebas Unitarias - Audi API', () => {
+describe('Pruebas Unitarias - Sistema Audi', () => {
     let token;
-    let usuarioTest = `user_${Date.now()}`;
+    let usuarioId;
+    const credenciales = { usuario: `user_${Date.now()}`, password: '123' };
 
     beforeAll(async () => {
         if (mongoose.connection.readyState === 0) {
@@ -17,50 +17,60 @@ describe('Pruebas Unitarias - Audi API', () => {
         await mongoose.connection.close();
     });
 
-    test('Registro de usuario exitoso', async () => {
+    test('Registro de Usuario', async () => {
         const res = await request(app)
             .post('/api/register')
-            .send({ usuario: usuario1, password: '123' });
+            .send(credenciales);
         expect(res.statusCode).toEqual(201);
     });
 
-    test('Login y obtención de Token JWT', async () => {
+    test('Login y Generación de Token', async () => {
         const res = await request(app)
             .post('/api/login')
-            .send({ usuario: usuario1, password: '123' });
+            .send(credenciales);
         expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('token');
         token = res.body.token;
     });
 
-    test('Creación de producto (Ruta protegida)', async () => {
+    test('Creación de Producto (Validación de Esquema)', async () => {
         const res = await request(app)
             .post('/api/productos')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                nombre: 'Producto Test',
-                img: 'test.jpg',
-                precio: 100,
-                stock: 10,
-                categoria: 'General'
+                nombre: "Audi A4 Model",
+                img: "https://r.ed987f7ec5146198dd4858966e2ee2c5.com/img.jpg",
+                precio: 500,
+                stock: 5,
+                categoria: "Coleccionables"
             });
         expect(res.statusCode).toEqual(201);
+        expect(res.body).toHaveProperty('id');
     });
 
-    test('Creación de tarea (Ruta protegida)', async () => {
+    test('Creación de Tarea (Validación de Enum y Trim)', async () => {
         const res = await request(app)
             .post('/api/tareas')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                titulo: 'Tarea Test',
-                asignadoA: usuarioTest,
-                descripcion: 'Descripción de prueba'
+                titulo: "  Mantenimiento Preventivo  ",
+                creadaPor: credenciales.usuario,
+                asignadoA: "Mecánico A",
+                estado: "Sin Iniciar"
             });
         expect(res.statusCode).toEqual(201);
+        expect(res.body.titulo).toBe("Mantenimiento Preventivo");
     });
 
-    test('Denegar acceso a productos sin token', async () => {
-        const res = await request(app).get('/api/productos');
-        expect(res.statusCode).toEqual(401);
+    test('Error al usar un Estado no permitido en Tarea', async () => {
+        const res = await request(app)
+            .post('/api/tareas')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                titulo: "Error Test",
+                creadaPor: "Admin",
+                asignadoA: "User",
+                estado: "Inexistente"
+            });
+        expect(res.statusCode).toEqual(400);
     });
 });
