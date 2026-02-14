@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('audi_token');
     const userName = localStorage.getItem('audi_user_name');
     const welcomeTitle = document.getElementById('welcome-user');
-    
+
+    if (!token) {
+        window.location.href = '../../ACT3/pages/login.html';
+        return;
+    }
+
     if (userName) {
         welcomeTitle.innerText = `BIENVENIDO, ${userName.toUpperCase()}`;
     }
