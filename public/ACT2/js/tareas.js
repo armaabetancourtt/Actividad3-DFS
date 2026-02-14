@@ -21,8 +21,8 @@ class Tarea {
 
 class GestorDeTareas {
     constructor() {
-        this.API_URL = 'http://localhost:3000/api/tareas'; 
-        this.USERS_URL = 'http://localhost:3000/api/usuarios';
+        this.API_URL = '/api/tareas'; 
+        this.USERS_URL = '/api/usuarios';
         this.token = localStorage.getItem('audi_token');
         this.usuarioActivo = this.obtenerNombreUsuario();
         this.tickets = [];
@@ -87,7 +87,7 @@ class GestorDeTareas {
             if (this.inputAsignadoA) {
                 this.inputAsignadoA.innerHTML = '<option value="">Seleccionar Responsable...</option>';
                 usuarios.forEach(user => {
-                    const nombre = user.nombre || user.usuario;
+                    const nombre = user.usuario || user.nombre;
                     if (nombre) {
                         const opt = document.createElement('option');
                         opt.value = nombre;
