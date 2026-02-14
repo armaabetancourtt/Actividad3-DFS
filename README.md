@@ -32,4 +32,8 @@ Contraseña: 123
 ```
 
 
+En los cambios se hace automáticamente el deploy gracias al pipeline CI/CD, esto se ve visible en Render.
+<img width="1920" height="837" alt="image" src="https://github.com/user-attachments/assets/9ac1bd46-950a-4824-a22f-2786cfb573da" />
+
+
 
